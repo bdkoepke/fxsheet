@@ -1,0 +1,52 @@
+entrypoints Cell;
+
+LOperCell. Cell ::=      Oper;
+LLitCell.  Cell ::=      Literal;
+LExprCell. Cell ::= "="  Expr;
+LArrCell.  Cell ::= "{=" Expr "}";
+
+token Literal ('\'' (letter | digit)*);
+
+
+LEqExpr.   Expr  ::= Expr  "==" Expr1;
+LNeqExpr.  Expr  ::= Expr  "<>" Expr1;
+LLeExpr.   Expr  ::= Expr  "<"  Expr1;
+LLeqExpr.  Expr  ::= Expr  "<=" Expr1;
+LGeExpr.   Expr  ::= Expr  ">"  Expr1;
+LGeqExpr.  Expr  ::= Expr  ">=" Expr1;
+LAndExpr.  Expr1 ::= Expr1 "&"  Expr2;
+LAddExpr.  Expr2 ::= Expr2 "+"  Expr3;
+LSubExpr.  Expr2 ::= Expr2 "-"  Expr3;
+LMulExpr.  Expr3 ::= Expr3 "*"  Expr4;
+LDivExpr.  Expr3 ::= Expr3 "/"  Expr4;
+LPowExpr.  Expr4 ::= Expr4 "^"  Expr5;
+LPerExpr.  Expr5 ::= Expr6 "%";
+LMinExpr.  Expr5 ::= "-" Expr6;
+LOperExpr. Expr6 ::= Oper;
+LUdfExpr.  Expr6 ::= Udf;
+
+coercions Expr 7;
+
+
+LUdf. Udf ::= Ident "(" [Expr] ")";
+
+
+LNumType.  Oper ::= Double;
+LStrType.  Oper ::= String;
+LRefType.  Oper ::= Ref;
+LRRefType. Oper ::= Ref ":" Ref;
+LErrType.  Oper ::= Error;
+LIntType.  Oper ::= Integer;
+LSRefType. Oper ::= SheetRef;
+LNameType. Oper ::= Ident;
+
+LRef.   Ref ::= TRef;
+LRCRef. Ref ::= TRCRef;
+
+LSheetRef.  SheetRef ::= Ident "!" Ref;
+LMSheetRef. SheetRef ::= Ident "!" Ref ":" Ref;
+
+
+token Error  ('#' letter+ '!');
+token TRef   ('$'? upper+ '$'? digit+);
+token TRCRef ('R' digit+ 'C' digit+);

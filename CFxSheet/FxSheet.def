@@ -1,0 +1,7 @@
+LIBRARY FxSheet.xll
+
+EXPORTS
+	xlAutoOpen
+	xlAutoClose
+	xlAddInManagerInfo
+	square
