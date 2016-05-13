@@ -29,6 +29,7 @@ coercions Expr 7;
 
 
 LUdf. Udf ::= Ident "(" [Expr] ")";
+separator Expr ",";
 
 
 LNumType.  Oper ::= Double;
