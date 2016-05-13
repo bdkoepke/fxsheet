@@ -55,7 +55,7 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Parser\Parser\Parser.fsproj">
+    <ProjectReference Include="..\Parser\Parser.fsproj">
       <Name>Parser</Name>
       <Project>{b6779f23-850e-41a6-bd55-c60ea21dc1e3}</Project>
       <Private>True</Private>

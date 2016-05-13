@@ -116,7 +116,7 @@
       <Project>{639cf4a2-b53d-4260-a5b7-8869b3868e4b}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\Source\Compiler\Parser\Parser\Parser.fsproj">
+    <ProjectReference Include="..\..\Source\Compiler\Parser\Parser.fsproj">
       <Name>Parser</Name>
       <Project>{b6779f23-850e-41a6-bd55-c60ea21dc1e3}</Project>
       <Private>True</Private>

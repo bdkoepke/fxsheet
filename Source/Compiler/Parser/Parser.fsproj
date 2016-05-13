@@ -56,21 +56,21 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FParsec">
-      <HintPath>..\..\packages\FParsec.1.0.2\lib\net40-client\FParsec.dll</HintPath>
+      <HintPath>..\..\..\packages\FParsec.1.0.2\lib\net40-client\FParsec.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FParsecCS">
-      <HintPath>..\..\packages\FParsec.1.0.2\lib\net40-client\FParsecCS.dll</HintPath>
+      <HintPath>..\..\..\packages\FParsec.1.0.2\lib\net40-client\FParsecCS.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Core">
-      <HintPath>..\..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
+      <HintPath>..\..\..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Ast\Ast.fsproj">
+    <ProjectReference Include="..\Ast\Ast.fsproj">
       <Name>Ast</Name>
       <Project>{639cf4a2-b53d-4260-a5b7-8869b3868e4b}</Project>
       <Private>True</Private>
