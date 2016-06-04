@@ -11,14 +11,18 @@ type ILCompiler() =
             let cell = qparse definition.Expression
 
             let rec argTypeList =
+                let mutable ctx = Set.empty
                 let rec exprTypeList = function
                     | Comparison(lhs, c, rhs) -> exprTypeList lhs @ exprTypeList rhs
                     | Logical(lhs, l, rhs) ->    exprTypeList lhs @ exprTypeList rhs
                     | Arithmetic(lhs, a, rhs) -> exprTypeList lhs @ exprTypeList rhs
                     | Unary(u, x) ->             exprTypeList x
                     | Type(x) ->                 match x with
-                                                 | Ref _ ->  [typeof<obj>]
-                                                 | SRef _ -> [typeof<obj>]
+                                                 | Ref r ->  if ctx.Contains(r) then []
+                                                             else
+                                                                ctx <- ctx.Add(r)
+                                                                [typeof<double>]
+                                                 | SRef r -> [typeof<double>]
                                                  | _ ->      []
                     | UdfExpr(e, xs) ->          failwith "Not implemented..."
                 function
@@ -33,14 +37,13 @@ type ILCompiler() =
             let il = dynamicMethod.GetILGenerator()
 
             let mutable nArgs = 0
-            let emitLdArg (il : ILGenerator) =
-                match nArgs with
+            let emitLdArg n (il: ILGenerator)=
+                match n with
                 | 0 -> il.Emit(OpCodes.Ldarg_0)
                 | 1 -> il.Emit(OpCodes.Ldarg_1)
                 | 2 -> il.Emit(OpCodes.Ldarg_2)
                 | 3 -> il.Emit(OpCodes.Ldarg_3)
-                | _ -> il.Emit(OpCodes.Ldarg, nArgs)
-                nArgs <- nArgs + 1
+                | _ -> il.Emit(OpCodes.Ldarg, n)
 
             let emitComparison(il: ILGenerator) = function
                 | Eq ->  il.Emit(OpCodes.Ceq)
@@ -70,12 +73,19 @@ type ILCompiler() =
                 | Neg -> il.Emit(OpCodes.Neg)
                 | Mod -> failwith "Unimplemented..."
 
+            let mutable ctx = Map.empty
             let emitType(il: ILGenerator) = function
                 | Num(x) ->  il.Emit(OpCodes.Ldc_R8, x)
                 | Int(x) ->  il.Emit(OpCodes.Ldc_I8, x)
                 | Str(_) ->  failwith "Unimplemented..."
-                | Ref(_) ->  emitLdArg il
-                | SRef(_) -> emitLdArg il
+                | Ref(x) ->  
+                    if ctx.ContainsKey(x) then
+                        emitLdArg (ctx.Item x) il
+                    else
+                        ctx <- ctx.Add(x, nArgs)
+                        emitLdArg nArgs il
+                        nArgs <- nArgs + 1
+                | SRef(_) -> emitLdArg nArgs il
                 | Err(_) ->  failwith "Unimplemented..."
                 | Name(_) -> failwith "Unimplemented..."
 

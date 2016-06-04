@@ -2,30 +2,19 @@
 
 module Parser =
     open FParsec
+    open FParsec.CharParsers
     open Ast
-
-    // AST definition
-    ////////////////////////
-
-    (*type Expr = 
-        | Pow of Expr*Expr
-        | Mul of Expr*Expr
-        | Div of Expr*Expr
-        | Add of Expr*Expr
-        | Sub of Expr*Expr
-        | Unary of Expr
-        | Num of float
-        | Int of int
-        | Func of string*Expr list *)
-
-    // the parser definition
-    ////////////////////////
 
     let ws = spaces // skips any whitespace
 
     let ch c = skipChar c >>. ws
-    let str s = skipString s >>. ws
 
+    let letters (x: char list) = x |> Array.ofList |> System.String.Concat
+    let lettersToInt (xs: char list) = xs |> List.map System.Char.ToUpper |> List.fold (fun acc x -> acc * 26 + (int(x) - int('A'))) 0
+
+    let error: Parser<xlexpr, unit> = (ch '#') >>. (many1 letter) .>> (ch '!') |>> (fun x -> Type(Str(letters x)))
+    let ref: Parser<xlexpr, unit> = optional (ch '$') >>. (many1 letter) .>> optional (ch '$') .>>. pint32
+                                    |>> (fun (x, y) -> Type(Ref((lettersToInt x, y))))
     let number: Parser<xlexpr, unit> = pfloat .>> ws |>> (fun x -> Type(Num(x)))
 
     let inner_term_p, pRef = createParserForwardedToRef()
@@ -42,7 +31,7 @@ module Parser =
     // function call
     let fcall_p = pipe2 idStr args (fun fname fargs -> UdfExpr(fname, fargs))
 
-    opp.TermParser <- choice [number; fcall_p; between (ch '(') (ch ')') expr]
+    opp.TermParser <- choice [number; ref; fcall_p; between (ch '(') (ch ')') expr]
 
     // operator definitions follow the schema
     // operator type, string, trailing whitespace parser, precedence, associativity, function to apply
@@ -62,10 +51,9 @@ module Parser =
     let completeExpression = ws >>. expr .>> eof // we append the eof parser to make
                                                 // sure all input is consumed
 
-    let calculate exp = run completeExpression exp
+    let calculate = run completeExpression
 
-    let parse x =
-        match x with
+    let parse = function
         | Success (x', _, _) -> x'
         | Failure (msg, _, _) -> failwith msg
 
