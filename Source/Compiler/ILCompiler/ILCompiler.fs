@@ -13,10 +13,10 @@ type ILCompiler() =
             let rec argTypeList =
                 let mutable ctx = Set.empty
                 let rec exprTypeList = function
-                    | Comparison(lhs, c, rhs) -> exprTypeList lhs @ exprTypeList rhs
-                    | Logical(lhs, l, rhs) ->    exprTypeList lhs @ exprTypeList rhs
-                    | Arithmetic(lhs, a, rhs) -> exprTypeList lhs @ exprTypeList rhs
-                    | Unary(u, x) ->             exprTypeList x
+                    | Comparison(lhs, _, rhs) -> exprTypeList lhs @ exprTypeList rhs
+                    | Logical(lhs, _, rhs) ->    exprTypeList lhs @ exprTypeList rhs
+                    | Arithmetic(lhs, _, rhs) -> exprTypeList lhs @ exprTypeList rhs
+                    | Unary(_, x) ->             exprTypeList x
                     | Type(x) ->                 match x with
                                                  | Ref r ->  if ctx.Contains(r) then []
                                                              else
@@ -24,7 +24,7 @@ type ILCompiler() =
                                                                 [typeof<double>]
                                                  | SRef r -> [typeof<double>]
                                                  | _ ->      []
-                    | UdfExpr(e, xs) ->          failwith "Not implemented..."
+                    | UdfExpr(_, xs) ->          xs |> List.fold (fun acc x -> acc @ exprTypeList x) []
                 function
                 | Expr(expr) -> exprTypeList expr
                 | ArrayExpr(expr) -> exprTypeList expr
@@ -62,22 +62,25 @@ type ILCompiler() =
             let emitLogical(il: ILGenerator) = function
                 | And -> il.Emit(OpCodes.And)
 
+            let pow = typeof<System.Math>.GetMethod("Pow", [typeof<double>; typeof<double>] |> List.toArray)
+
             let emitArithmetic(il: ILGenerator) = function
                 | Add -> il.Emit(OpCodes.Add)
                 | Sub -> il.Emit(OpCodes.Sub)
                 | Mul -> il.Emit(OpCodes.Mul)
                 | Div -> il.Emit(OpCodes.Div)
-                | Pow -> failwith "Unimplemented..."
+                | Pow -> il.Emit(OpCodes.Call, pow)
 
             let emitUnary(il: ILGenerator) = function
                 | Neg -> il.Emit(OpCodes.Neg)
-                | Mod -> failwith "Unimplemented..."
+                | Mod -> il.Emit(OpCodes.Ldc_R8, 100.0)
+                         il.Emit(OpCodes.Div)
 
             let mutable ctx = Map.empty
             let emitType(il: ILGenerator) = function
                 | Num(x) ->  il.Emit(OpCodes.Ldc_R8, x)
                 | Int(x) ->  il.Emit(OpCodes.Ldc_I8, x)
-                | Str(_) ->  failwith "Unimplemented..."
+                | Str(x) ->  il.Emit(OpCodes.Ldstr, x)
                 | Ref(x) ->  
                     if ctx.ContainsKey(x) then
                         emitLdArg (ctx.Item x) il
@@ -86,7 +89,7 @@ type ILCompiler() =
                         emitLdArg nArgs il
                         nArgs <- nArgs + 1
                 | SRef(_) -> emitLdArg nArgs il
-                | Err(_) ->  failwith "Unimplemented..."
+                | Err(x) ->  failwith x
                 | Name(_) -> failwith "Unimplemented..."
 
             let rec emitExpr (il : ILGenerator) = function
@@ -102,7 +105,9 @@ type ILCompiler() =
                 | Unary(u, x) ->             emitExpr il x
                                              emitUnary il u
                 | Type(x) ->                 emitType il x
-                | UdfExpr(_, xs) ->          xs |> List.iter (emitExpr il)
+                | UdfExpr(n, xs) ->          il.Emit(OpCodes.Ldstr, n)
+                                             xs |> List.iter (emitExpr il)
+                                             (* il.Emit(OpCodes.Call, runUdf) *)
 
             let rec emitCell (il : ILGenerator) = function
                 | Expr(expr) ->      emitExpr il expr

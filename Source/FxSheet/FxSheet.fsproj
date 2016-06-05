@@ -70,6 +70,14 @@ xcopy "$(SolutionDir)\packages\ExcelDna.AddIn.0.33.9\tools\ExcelDna64.xll" "$(Ta
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="ExcelAddIn.fs" />
+    <COMReference Include="Microsoft Office 16.0 Object Library">
+      <Guid>{2df8d04c-5bfa-101b-bde5-00aa0044de52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <Isolated>False</Isolated>
+      <WrapperTool>primary</WrapperTool>
+    </COMReference>
     <Content Include="packages.config" />
     <Content Include="FxSheet-AddIn.dna">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

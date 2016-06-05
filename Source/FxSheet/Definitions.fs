@@ -48,7 +48,9 @@ module Definitions =
 
             let uniquePending  =
                 pending
-                |> List.filter(fun d -> not(registered.ContainsKey(d.Name)))
+                |> List.filter(fun d ->
+                    (* TODO: Unregister existing functions... *)
+                    not(registered.ContainsKey(d.Name)) || not((registered.Item d.Name).Expression.Equals(d.Expression)))
             uniquePending
                 |> List.iter(fun d -> registered <- registered.Add(d.Name, d))
             let compiled = 

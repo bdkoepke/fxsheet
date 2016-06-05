@@ -36,19 +36,30 @@ module Parser =
     // operator definitions follow the schema
     // operator type, string, trailing whitespace parser, precedence, associativity, function to apply
 
-    opp.AddOperator(InfixOperator("+", ws, 1, Associativity.Left, fun x y -> Arithmetic(x, Add, y)))
-    opp.AddOperator(InfixOperator("-", ws, 1, Associativity.Left, fun x y -> Arithmetic(x, Sub, y)))
+    opp.AddOperator(InfixOperator("==", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Eq, y)))
+    opp.AddOperator(InfixOperator("<>", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Neq, y)))
+    opp.AddOperator(InfixOperator("<", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Lt, y)))
+    opp.AddOperator(InfixOperator("<=", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Leq, y)))
+    opp.AddOperator(InfixOperator(">", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Gt, y)))
+    opp.AddOperator(InfixOperator(">=", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Geq, y)))
 
-    opp.AddOperator(InfixOperator("*", ws, 2, Associativity.Left, fun x y -> Arithmetic(x, Mul, y)))
-    opp.AddOperator(InfixOperator("/", ws, 2, Associativity.Left, fun x y -> Arithmetic(x, Div, y)))
+    opp.AddOperator(InfixOperator("&", spaces, 2, Associativity.Left, fun x y -> Logical(x, And, y)))
 
-    //opp.AddOperator(InfixOperator("^", ws, 3, Associativity.Right, fun x y -> PowExpr(x, y)))
+    opp.AddOperator(InfixOperator("+", ws, 3, Associativity.Left, fun x y -> Arithmetic(x, Add, y)))
+    opp.AddOperator(InfixOperator("-", ws, 3, Associativity.Left, fun x y -> Arithmetic(x, Sub, y)))
 
-    opp.AddOperator(PrefixOperator("-", ws, 4, true, fun x -> Unary(Neg, x)))
+    opp.AddOperator(InfixOperator("*", ws, 4, Associativity.Left, fun x y -> Arithmetic(x, Mul, y)))
+    opp.AddOperator(InfixOperator("/", ws, 4, Associativity.Left, fun x y -> Arithmetic(x, Div, y)))
+
+    opp.AddOperator(InfixOperator("^", ws, 5, Associativity.Left, fun x y -> Arithmetic(x, Pow, y)))
+
+    opp.AddOperator(PrefixOperator("-", ws, 6, true, fun x -> Unary(Neg, x)))
+
+    opp.AddOperator(PostfixOperator("%", ws, 6, true, fun x -> Unary(Mod, x)))
 
     pRef := expr
 
-    let completeExpression = ws >>. expr .>> eof // we append the eof parser to make
+    let completeExpression = (optional (ch '=')) >>. ws >>. expr .>> eof // we append the eof parser to make
                                                 // sure all input is consumed
 
     let calculate = run completeExpression
@@ -58,18 +69,3 @@ module Parser =
         | Failure (msg, _, _) -> failwith msg
 
     let qparse exp = calculate exp |> parse
-
-    (* opp.AddOperator(InfixOperator("==", spaces, 1, Associativity.Left, (fun x y -> EqExpr(x, y))))
-    opp.AddOperator(InfixOperator("<>", spaces, 1, Associativity.Left, (fun x y -> NeqExpr(x, y))))
-    opp.AddOperator(InfixOperator("<", spaces, 1, Associativity.Left, (fun x y -> LExpr(x, y))))
-    opp.AddOperator(InfixOperator("<=", spaces, 1, Associativity.Left, (fun x y -> LeqExpr(x, y))))
-    opp.AddOperator(InfixOperator(">", spaces, 1, Associativity.Left, (fun x y -> GExpr(x, y))))
-    opp.AddOperator(InfixOperator(">=", spaces, 1, Associativity.Left, (fun x y -> GeqExpr(x, y))))
-    opp.AddOperator(InfixOperator("&", spaces, 2, Associativity.Left, (fun x y -> AndExpr(x, y))))
-    opp.AddOperator(InfixOperator("+", spaces, 3, Associativity.Left, (fun addend augend -> AddExpr(addend, augend))))
-    opp.AddOperator(InfixOperator("-", spaces, 3, Associativity.Left, (fun minuend subtrahend -> SubExpr(minuend, subtrahend))))
-    opp.AddOperator(InfixOperator("*", spaces, 4, Associativity.Left, (fun multiplier multiplicand -> MulExpr(multiplier, multiplicand))))
-    opp.AddOperator(InfixOperator("/", spaces, 4, Associativity.Left, (fun dividend divisor -> DivExpr(dividend, divisor))))
-    opp.AddOperator(InfixOperator("^", spaces, 5, Associativity.Right, (fun base' exponent -> PowExpr(base', exponent))))
-    opp.AddOperator(PostfixOperator("%", spaces, 6, true, (fun x -> PerExpr(x))))
-    opp.AddOperator(PrefixOperator("-", spaces, 7, true, (fun x -> MinExpr(x)))) *)
