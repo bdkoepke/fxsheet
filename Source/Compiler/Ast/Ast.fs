@@ -34,7 +34,7 @@ module Ast =
         | Arithmetic of xlexpr * arithmetic * xlexpr
         | Unary of unary * xlexpr
         | Type of xltype
-        | UdfExpr of string * (xlexpr list) 
+        | Function of string * (xlexpr list) 
 
     type xlcell =
         | Expr of xlexpr

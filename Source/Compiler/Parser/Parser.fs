@@ -29,12 +29,10 @@ module Parser =
     let args = between (ch '(') (ch ')')  arg_list
 
     // function call
-    let fcall_p = pipe2 idStr args (fun fname fargs -> UdfExpr(fname, fargs))
+    let fcall_p =
+        pipe2 idStr args (fun fname fargs -> Function(fname, fargs))
 
-    opp.TermParser <- choice [number; ref; fcall_p; between (ch '(') (ch ')') expr]
-
-    // operator definitions follow the schema
-    // operator type, string, trailing whitespace parser, precedence, associativity, function to apply
+    opp.TermParser <- choice [fcall_p; number; ref; between (ch '(') (ch ')') expr]
 
     opp.AddOperator(InfixOperator("==", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Eq, y)))
     opp.AddOperator(InfixOperator("<>", spaces, 1, Associativity.Left, fun x y -> Comparison(x, Neq, y)))

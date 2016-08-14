@@ -20,7 +20,7 @@ module ParserTest =
     [<Fact>]
     let ``evaluate (123 + log 1 + 877) * 9/3 should equal 3000``() =
         calculate "(123 + log(1) + 877) * 9/3" |> parse
-        |> should equal (Arithmetic(Arithmetic(Arithmetic(Arithmetic(Type(Num(123.0)), Add, UdfExpr("log", [Type(Num(1.0))])), Add, Type(Num(877.0))), Mul, Type(Num(9.0))), Div, Type(Num(3.0))))
+        |> should equal (Arithmetic(Arithmetic(Arithmetic(Arithmetic(Type(Num(123.0)), Add, Function("log", [Type(Num(1.0))])), Add, Type(Num(877.0))), Mul, Type(Num(9.0))), Div, Type(Num(3.0))))
 
     (* [<Fact>]
     let ``evaluate ( ( exp 0 + (6 / ( 1 +2 ) )- 123456 )/ 2+123 + 877) * 3^2 / 3 should equal -182179.5``() =

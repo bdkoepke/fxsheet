@@ -1,10 +1,11 @@
 ﻿namespace FxSheet
 
 open ExcelDna.Integration
+open FxSheet.Compiler
 
 module Functions =
     let private manager = new Definitions.DefinitionManager(
-                              List.Empty,
+                              List.empty,
                               Map.empty,
                               new Definitions.DefinitionCompiler(
                                 new ILCompiler()))

@@ -2,6 +2,7 @@
 
 open System.Reflection
 open ExcelDna.Integration
+open FxSheet.Compiler
 
 module Definitions =
     [<NoComparison>]
@@ -30,6 +31,7 @@ module Definitions =
                            compiler : DefinitionCompiler) = 
         let mutable pending = pending
         let mutable registered = registered
+        (* static member ID (test: obj) : obj = test *)
 
         member this.EnqueueDefinition(name : string, expression: string) =
             pending <- {Name=name;
@@ -50,7 +52,8 @@ module Definitions =
                 pending
                 |> List.filter(fun d ->
                     (* TODO: Unregister existing functions... *)
-                    not(registered.ContainsKey(d.Name)) || not((registered.Item d.Name).Expression.Equals(d.Expression)))
+                    not(registered.ContainsKey(d.Name)) ||
+                    not((registered.Item d.Name).Expression.Equals(d.Expression)))
             uniquePending
                 |> List.iter(fun d -> registered <- registered.Add(d.Name, d))
             let compiled = 
