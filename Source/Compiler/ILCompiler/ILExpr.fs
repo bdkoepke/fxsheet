@@ -71,3 +71,7 @@ module ILExpr =
     let emitArrayNew il n =
         emitLdcI4 il n
         il.Emit(OpCodes.Newarr, typeof<obj>)
+
+    let emitBool(il: ILGenerator) = function
+        | true -> il.Emit(OpCodes.Ldc_I4_1)
+        | false -> il.Emit(OpCodes.Ldc_I4_0)

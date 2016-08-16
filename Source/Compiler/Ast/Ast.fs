@@ -1,41 +1,46 @@
 ﻿namespace FxSheet
 
 module Ast =
-    type xltypeNum = float
-    type xltypeStr = string
-    type xltypeBool = bool
-    type xltypeRef = int * int
-    type xltypeErr = string
-    type xltypeSRef = string * xltypeRef
-    type xltypeInt = int
 
-    type xltypeName = string
+    type xlconstNum = float
+    type xlconstInt = int64
+    type xlconstText = string
+    type xlconstBool = bool
+    type xlconstErr = NULL | DIV | VALUE | NAME | NUM | NA | REF
+
+    type xlconst =
+        | Num of xlconstNum
+        | Int of xlconstInt
+        | Text of xlconstText
+        | Bool of xlconstBool
+        | Err of xlconstErr
+
+    type xlconstArray = xlconst list
+
+    type xlrefName = string
+    type xlrefCell = int * int
+    type xlrefSheetCell = string * xlrefCell
+
+    type xlref = 
+        | Name of xlrefName
+        | Cell of xlrefCell
+        | SheetCell of xlrefSheetCell
 
     type xltype =
-        | Num of xltypeNum
-        | Int of xltypeInt
-        | Str of xltypeStr
-        | Ref of xltypeRef
-        | SRef of xltypeSRef
-        | Err of xltypeErr
-        | Name of xltypeName
+        | Const of xlconst
+        | Ref of xlref
 
-    type arithmetic = | Add | Sub | Mul | Div | Pow
-
-    type comparison = | Eq | Neq | Lt | Leq | Gt | Geq
-
-    type logical = | And
-
-    type unary = | Neg | Mod
+    type binary = | Eq | Neq | Lt | Leq | Gt | Geq | Add | Sub | Mul | Div | Pow | And
+    type unary = | Add' | Neg | Mod
 
     type xlexpr =
-        | Comparison of xlexpr * comparison * xlexpr
-        | Logical of xlexpr * logical * xlexpr
-        | Arithmetic of xlexpr * arithmetic * xlexpr
-        | Unary of unary * xlexpr
+        | Binary of xlexpr * binary * xlexpr
+        | Unary of unary * xlexpr 
         | Type of xltype
         | Function of string * (xlexpr list) 
+        | Array of xlconstArray
 
     type xlcell =
+        | Const' of xlconst
         | Expr of xlexpr
         | ArrayExpr of xlexpr
