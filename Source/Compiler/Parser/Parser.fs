@@ -1,8 +1,7 @@
-﻿namespace FxSheet
+namespace FxSheet
 
 module Parser =
     open FParsec
-    open FParsec.CharParsers
     open Ast
 
     (* TODO: need to support intersection operator... *)
@@ -49,7 +48,7 @@ module Parser =
     let idStr = many1Satisfy isLower
 
     // we set up an operator precedence parser for parsing the arithmetic expressions
-    let opp = new OperatorPrecedenceParser<_,_,_>()
+    let opp = OperatorPrecedenceParser<_,_,_>()
 
     let expr = opp.ExpressionParser
     let arg_list = sepBy expr (ch ',')
@@ -84,7 +83,7 @@ module Parser =
 
     (* TODO: Add , '_', : operator? *)
 
-    pRef := expr
+    pRef.Value <- expr
 
     let completeExpression = (optional (ch '=')) >>. ws >>. expr .>> eof
 

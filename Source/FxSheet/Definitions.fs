@@ -21,7 +21,7 @@ module Definitions =
             let dynamicMethod = compiler.Compile(d)
         
             { Method=dynamicMethod;
-              FunctionAttribute=new ExcelFunctionAttribute(attribute);
+              FunctionAttribute= ExcelFunctionAttribute(attribute);
               ArgumentAttributes=d.ArgumentDescriptions
                               |> List.map(fun x -> x :> obj)
                               |> System.Linq.Enumerable.ToList } 
@@ -42,11 +42,11 @@ module Definitions =
             name
 
         member this.RegisterDefinitions() =
-            let methods = new System.Collections.Generic.List<MethodInfo>()
-            let functionAttributes = new System.Collections.Generic.List<obj>()
+            let methods = System.Collections.Generic.List<MethodInfo>()
+            let functionAttributes = System.Collections.Generic.List<obj>()
             let argumentAttributes =
-                new System.Collections.Generic.List<
-                    System.Collections.Generic.List<obj>>()
+                System.Collections.Generic.List<
+                System.Collections.Generic.List<obj>>()
 
             let uniquePending  =
                 pending
@@ -58,7 +58,7 @@ module Definitions =
                 |> List.iter(fun d -> registered <- registered.Add(d.Name, d))
             let compiled = 
                 uniquePending
-                |> List.map(fun d -> compiler.Compile(d))
+                |> List.map(compiler.Compile)
 
             compiled |> List.iter(fun c -> methods.Add(c.Method))
             compiled |>

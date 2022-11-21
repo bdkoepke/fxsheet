@@ -1,13 +1,10 @@
 ﻿namespace FxSheet
 
-open ExcelDna.Integration
-open System.Reflection
-open System.Reflection.Emit
 open FxSheet.Ast
 open FxSheet.Compiler
 open FxSheet.ILExpr
 open FxSheet.Parser
-open System
+open System.Reflection.Emit 
 
 module Compiler = 
     type ILCompiler() =
@@ -21,14 +18,14 @@ module Compiler =
                         | Type(x) ->             match x with
                                                  | Ref r -> 
                                                     match r with
-                                                    | Cell r' -> 
+                                                    | Cell _ -> 
                                                         if Set.contains r locals then []
                                                         else locals <- Set.add r locals
                                                              [typeof<double>]
                                                     | _ -> failwith "Not implemented."
                                                  | _ ->      []
                         | Function(_, xs) ->     xs |> List.fold (fun acc x -> acc @ exprTypeList x) []
-                        | Array(xs) ->           failwith "Not implemented."
+                        | Array _ ->           failwith "Not implemented."
                     exprTypeList
 
                 let emitBinary(il: ILGenerator) f =
@@ -74,7 +71,7 @@ module Compiler =
                         | Const(x) -> emitConst il x
                         | Ref(x) ->  
                             match x with
-                            | Cell(x') ->
+                            | Cell _ ->
                                 if Map.containsKey x locals then
                                     emitLdArg il (Map.find x locals)
                                 else
@@ -92,27 +89,19 @@ module Compiler =
                         emitExpr il x
                         il.Emit(OpCodes.Box, typeof<double>)
                         il.Emit(OpCodes.Stelem_Ref)
-
-                    let emitArraySetBool i x =
-                        il.Emit(OpCodes.Dup)
-                        emitLdcI4 il i
-                        emitExpr il x
-                        il.Emit(OpCodes.Box, typeof<bool>)
-                        il.Emit(OpCodes.Stelem_Ref)
-
                     let emitUdf f xs =
                         emitArrayNew il ((xs |> List.length) + 1)
                         emitArraySetStr il 0 f
-                        xs |> List.iteri (fun i x -> emitArraySet (i + 1) x)
+                        xs |> List.iteri (fun i -> emitArraySet (i + 1))
                         il.EmitCall(OpCodes.Call, typeof<ILFunction>.GetMethod("runUdf"), null)
                     let emitXlf f xs =
                         emitLdcI4 il (Map.find f ILFunction.xlfMap)
                         emitArrayNew il (xs |> List.length)
                         xs |> List.iteri emitArraySet
                         il.EmitCall(OpCodes.Call, typeof<ILFunction>.GetMethod("runXlf"), null)
-                    let emitIf f xs =
+                    let emitIf _ xs =
                         match xs with
-                        | test::lhs::rhs::[] -> 
+                        | test::lhs::[ rhs ] -> 
                             let equal = il.DefineLabel()
                             let not_equal = il.DefineLabel()
                             let end_if = il.DefineLabel()
@@ -142,7 +131,7 @@ module Compiler =
                                                     emitIf
                                                  else
                                                     emitUdf)) f xs
-                    | Array(xs) ->           failwith "Not implemented."
+                    | Array _->           failwith "Not implemented."
 
                 let rec emitCell (il : ILGenerator) = function
                     | Const'(c) ->       emitConst il c
@@ -152,9 +141,9 @@ module Compiler =
                                          il.Emit(OpCodes.Ret)
 
                 let cell = qparse definition.Expression
-                let dynamicMethod = new DynamicMethod(definition.Name,
-                                                      typeof<double>,
-                                                      argTypeList cell |> List.toArray)
+                let dynamicMethod = DynamicMethod(definition.Name,
+                                                  typeof<double>,
+                                                  argTypeList cell |> List.toArray)
                 let il = dynamicMethod.GetILGenerator()
                 emitCell il (Expr(cell))
                 upcast dynamicMethod

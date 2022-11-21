@@ -1,7 +1,6 @@
 ﻿namespace FxSheet
 
-open System.Reflection
-open System.Reflection.Emit
+open System.Reflection.Emit 
 open System
 
 module ILExpr =

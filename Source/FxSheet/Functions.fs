@@ -4,11 +4,11 @@ open ExcelDna.Integration
 open FxSheet.Compiler
 
 module Functions =
-    let private manager = new Definitions.DefinitionManager(
+    let private manager = Definitions.DefinitionManager(
                               List.empty,
                               Map.empty,
-                              new Definitions.DefinitionCompiler(
-                                new ILCompiler()))
+                              Definitions.DefinitionCompiler(
+                                ILCompiler()))
 
     [<ExcelFunction(Description = "Defines a new function.")>]
     let DEFINE (name : string, expression : string) = manager.EnqueueDefinition(name, expression)
