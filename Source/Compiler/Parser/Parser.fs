@@ -2,7 +2,6 @@ namespace FxSheet
 
 module Parser =
     open FParsec
-    open FParsec.Primitives
     open Ast
 
     (* TODO: need to support intersection operator... *)
@@ -66,7 +65,7 @@ module Parser =
 
     opp.TermParser <- choice [fcall_p; xlnumber; xlbool; xlerror; xlref; xltext; between (ch '(') (ch ')') expr]
 
-    opp.AddOperator(InfixOperator("==", spaces, 1, Associativity.Left, fun x y -> Binary(x, Eq, y)))
+    opp.AddOperator(InfixOperator("=", spaces, 1, Associativity.Left, fun x y -> Binary(x, Eq, y)))
     opp.AddOperator(InfixOperator("<>", spaces, 1, Associativity.Left, fun x y -> Binary(x, Neq, y)))
     opp.AddOperator(InfixOperator("<", spaces, 1, Associativity.Left, fun x y -> Binary(x, Lt, y)))
     opp.AddOperator(InfixOperator("<=", spaces, 1, Associativity.Left, fun x y -> Binary(x, Leq, y)))
@@ -89,7 +88,6 @@ module Parser =
     opp.AddOperator(PrefixOperator("+", ws, 7, true, fun x -> Unary(Add', x)))
 
     (* TODO: Add , '_', : operator? *)
-
     pRef.Value <- expr
 
     let completeExpression = (optional (ch '=')) >>. ws >>. expr .>> eof
