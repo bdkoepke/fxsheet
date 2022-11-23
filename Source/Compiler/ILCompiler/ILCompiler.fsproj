@@ -13,9 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AST\AST.fsproj" />
-      <ProjectReference Include="..\Compiler\AST\AST.fsproj" />
       <ProjectReference Include="..\Compiler\Compiler.fsproj" />
-      <ProjectReference Include="..\Compiler\Compiler\Compiler.fsproj" />
       <ProjectReference Include="..\Parser\Parser.fsproj" />
     </ItemGroup>
 
