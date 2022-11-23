@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <TargetFramework>net481</TargetFramework>
+        <TargetFramework>net6.0-windows</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,7 +20,12 @@
 
     <ItemGroup>
       <PackageReference Include="ExcelDna.AddIn" Version="1.6.0" />
-      <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1001" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.Office.Interop.Excel">
+        <HintPath>..\..\..\..\..\..\Program Files\Microsoft Office\root\vfs\ProgramFilesX86\Microsoft Office\Office16\DCF\Microsoft.Office.Interop.Excel.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

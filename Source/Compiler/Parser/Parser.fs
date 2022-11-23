@@ -2,6 +2,7 @@ namespace FxSheet
 
 module Parser =
     open FParsec
+    open FParsec.Primitives
     open Ast
 
     (* TODO: need to support intersection operator... *)
@@ -23,9 +24,15 @@ module Parser =
             | "REF" -> REF
             | _ -> failwith "Unknown error type."
         (ch '#') >>. regex "(N(\/A|AME\?|(ULL|UM)!)|(DIV\/0|VALUE|REF)!)" |>> errorStrToError |>> Err |>> Const |>> Type
-
-    (* TODO: Confirm integer type... *)
-    let xlint: Parser<xlexpr, unit> = pint64 .>> ws |>> Int |>> Const |>> Type
+    
+    (* TODO: Confirm integer type...
+    let xlnumber: Parser<xlexpr, unit> =
+        let numberFormat = NumberLiteralOptions.AllowMinusSign
+                           ||| NumberLiteralOptions.AllowExponent
+        numberLiteral numberFormat "number"
+        |>> fun nl -> if nl.IsInteger then nl.String |> int64 |> Int
+                      else nl.String |> float |> Num
+        |>> Const |>> Type  *)
 
     let xlnumber: Parser<xlexpr, unit> = pfloat .>> ws |>> Num |>> Const |>> Type
 
@@ -57,7 +64,7 @@ module Parser =
     // function call
     let fcall_p = pipe2 idStr args (fun fname fargs -> Function(fname, fargs))
 
-    opp.TermParser <- choice [fcall_p; xlint; xlnumber; xlbool; xlerror; xlref; xltext; between (ch '(') (ch ')') expr]
+    opp.TermParser <- choice [fcall_p; xlnumber; xlbool; xlerror; xlref; xltext; between (ch '(') (ch ')') expr]
 
     opp.AddOperator(InfixOperator("==", spaces, 1, Associativity.Left, fun x y -> Binary(x, Eq, y)))
     opp.AddOperator(InfixOperator("<>", spaces, 1, Associativity.Left, fun x y -> Binary(x, Neq, y)))
