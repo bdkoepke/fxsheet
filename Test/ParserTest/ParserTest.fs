@@ -23,5 +23,5 @@ module ParserTest =
     
     [<Fact>]
     let ``should be able to parse IF(OR(A1=0,A1=1),1,fib(A1-1)+fib(A1-2))``() =
-        qparse "if(A1=0,1,if(A1=1,1,fib(A1-1)+fib(A1-2)))"
+        qparse "if(A1=0,0,if(A1=1,1,fib(A1-1)+fib(A1-2)))"
         |> should equal (Function("if", [Binary (Type (Ref (Cell (0, 1))), Eq, Type (Const (Num 0.0))); Type (Const (Num 1.0)); Function("if", [Binary (Type (Ref (Cell (0, 1))), Eq, Type (Const (Num 1.0)));Type (Const (Num 1.0));Binary(Function("fib",[Binary (Type (Ref (Cell (0, 1))), Sub, Type (Const (Num 1.0)))]), Add, Function("fib",[Binary (Type (Ref (Cell (0, 1))), Sub, Type (Const (Num 2.0)))]))])]))
