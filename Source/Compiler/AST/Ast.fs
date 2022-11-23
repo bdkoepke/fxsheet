@@ -6,7 +6,15 @@ module Ast =
     type xlconstInt = int64
     type xlconstText = string
     type xlconstBool = bool
-    type xlconstErr = NULL | DIV | VALUE | NAME | NUM | NA | REF
+
+    type xlconstErr =
+        | NULL
+        | DIV
+        | VALUE
+        | NAME
+        | NUM
+        | NA
+        | REF
 
     type xlconst =
         | Num of xlconstNum
@@ -21,7 +29,7 @@ module Ast =
     type xlrefCell = int * int
     type xlrefSheetCell = string * xlrefCell
 
-    type xlref = 
+    type xlref =
         | Name of xlrefName
         | Cell of xlrefCell
         | SheetCell of xlrefSheetCell
@@ -30,14 +38,30 @@ module Ast =
         | Const of xlconst
         | Ref of xlref
 
-    type binary = | Eq | Neq | Lt | Leq | Gt | Geq | Add | Sub | Mul | Div | Pow | And
-    type unary = | Add' | Neg | Mod
+    type binary =
+        | Eq
+        | Neq
+        | Lt
+        | Leq
+        | Gt
+        | Geq
+        | Add
+        | Sub
+        | Mul
+        | Div
+        | Pow
+        | And
+
+    type unary =
+        | Add'
+        | Neg
+        | Mod
 
     type xlexpr =
         | Binary of xlexpr * binary * xlexpr
-        | Unary of unary * xlexpr 
+        | Unary of unary * xlexpr
         | Type of xltype
-        | Function of string * (xlexpr list) 
+        | Function of string * (xlexpr list)
         | Array of xlconstArray
 
     type xlcell =
